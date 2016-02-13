@@ -17,7 +17,10 @@
   },
   "homepage": "https://github.com/colestrode/notifications#readme",
   "dependencies": {
+    "google-spreadsheet": "^1.1.4",
     "googleapis": "^2.1.7",
+    "lodash": "^4.3.0",
+    "q": "^1.4.1",
     "sparkpost": "^1.1.0",
     "twilio": "^2.9.0"
   },
