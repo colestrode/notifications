@@ -4,6 +4,7 @@
   "description": "Notifications based on Google Calendar using SparkPost and Twilio",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "eslint index.js ./src"
   },
   "repository": {
