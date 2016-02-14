@@ -4,16 +4,19 @@ var GoogleSpreadsheet = require('google-spreadsheet');
 var _ = require('lodash');
 var q = require('q');
 var moment = require('moment');
-var mySheet = new GoogleSpreadsheet(process.env.GA_SPREADSHEET);
+var privateKey = process.env.G_PRIVATE_KEY.replace(/\\n/g, '\n');
 
+module.exports.getData = function() {
+  return q.all([getSheetData(), getCalendarEvents])
+    .spread(function(patients, appointments) {
+      // loop through events, if matches a patient, clone patient data and merge with event data
+      //
+      return patients;
+    });
+};
 
-// TODO narrow Drive scope
-var scopes = ['https://www.googleapis.com/auth/calendar.readonly', 'https://www.googleapis.com/auth/drive'];
-var privateKey = process.env.GA_PRIVATE_KEY.replace(/\\n/g, '\n');
-var jwtClient = new google.auth.JWT(process.env.GA_EMAIL, null, privateKey, scopes, null);
-
-
-module.exports.getSheetData = function() {
+function getSheetData() {
+  var mySheet = new GoogleSpreadsheet(process.env.G_SPREADSHEET);
   var auth = q.nbind(mySheet.useServiceAccountAuth, mySheet);
 
   return auth({client_email: process.env.GA_EMAIL, private_key: privateKey})
@@ -56,29 +59,46 @@ function makeFullname(user) {
 }
 
 
-module.exports.getCalendarEvents = function() {
-  gCalendar.events.list({
+function getCalendarEvents() {
+  var ids = process.env.G_CALENDAR_IDS.split(',');
+  var jwtClient = new google.auth.JWT(process.env.G_EMAIL, null, privateKey, ['https://www.googleapis.com/auth/calendar.readonly'], null);
+
+  return q.all(_.map(ids, _.partial(getEvents, jwtClient)))
+    .then(function(eventsByCalendar) {
+      var allEvents = [];
+      _.forEach(eventsByCalendar, function(events) {
+        allEvents = allEvents.concat(events);
+      });
+
+      return allEvents
+    });
+};
+
+function getEvents(jwtClient, calendarId) {
+  var listEvents = q.nbind(gCalendar.events.list, gCalendar.events);
+
+  // will return up to 250 events, this should be plenty :D
+  return listEvents({
     auth: jwtClient,
-    calendarId: 'primary', // TODO get real calendar
-    timeMin: moment.utc().toISOString(),
-    maxResults: 150,
+    calendarId: calendarId,
+    timeMin: moment.utc().startOf('hour').toISOString(),
+    timeMax: moment.utc().add(1, 'weeks').endOf('day').toISOString(),
     singleEvents: true,
     orderBy: 'startTime'
-  }, function(err, response) {
-    if (err) {
-      console.log('The API returned an error: ' + err);
-      return;
-    }
-    var events = response.items;
-    if (events.length == 0) {
-      console.log('No upcoming events found.');
-    } else {
-      console.log('Upcoming 10 events:');
-      for (var i = 0; i < events.length; i++) {
-        var event = events[i];
-        var start = event.start.dateTime || event.start.date;
-        console.log('%s - %s', start, event.summary);
+  }).then(function(response) {
+    var events = response[0].items;
+    var creatorEvents = _.filter(events, function(event) {
+      return event.creator.email === process.env.G_CALENDAR_CREATOR;
+    });
+
+    return _.map(creatorEvents, function(event) {
+      return {
+        eventStart: moment(event.start.dateTime),
+        eventEnd: moment(event.end.dateTime),
+        eventCreated: moment(event.created),
+        eventUpdated: moment(event.updated),
+        eventSummary: event.summary
       }
-    }
+    });
   });
 }

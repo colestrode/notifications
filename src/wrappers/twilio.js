@@ -10,8 +10,8 @@ var sendMessage = q.nbind(client.sendMessage, client);
  * @param users
  * @returns {*}
  */
-module.exports.send = function(users) {
-  return q.all(_.map(users, sendOne))
+module.exports.send = function(recipients) {
+  return q.all(_.map(recipients, sendOne))
     .then(function(counts) {
       console.log('text message sent to ' + _.sum(counts) + ' recipients.');
     });
@@ -20,24 +20,23 @@ module.exports.send = function(users) {
 /**
  * Sends a text message to a single user
  *
- * @param user
+ * @param recipient
  */
-function sendOne(user) {
-  if (!user.sendText) {
+function sendOne(recipient) {
+  if (!recipient.sendText) {
     return q(0);
   }
 
   // TODO real message
   return sendMessage({
-    to: '+1' + sanitizeNumber(user.phonenumber),
+    to: '+1' + sanitizeNumber(recipient.phonenumber),
     from: process.env.TWILIO_NUMBER,
     body: 'word to your mother.'
   }).then(function() {
-    console.log('text notification sent');
     return 1;
   })
   .catch(function(err) {
-    console.log('error sending text to user ' + user.id);
+    console.log('error sending text to user ' + recipient.id);
     console.log(err);
   });
 }
