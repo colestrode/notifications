@@ -11,6 +11,7 @@ module.exports.getData = function() {
     .spread(function(patients, appointments) {
       // loop through events, if matches a patient, clone patient data and merge with event data
       //
+      console.log(appointments);
       return patients;
     });
 };
@@ -19,9 +20,10 @@ function getSheetData() {
   var mySheet = new GoogleSpreadsheet(process.env.G_SPREADSHEET);
   var auth = q.nbind(mySheet.useServiceAccountAuth, mySheet);
 
-  return auth({client_email: process.env.G_EMAIL, private_key: privateKey})
+  return auth({'client_email': process.env.G_EMAIL, 'private_key': privateKey})
     .then(function() {
       var sheetInfo = q.nbind(mySheet.getInfo, mySheet);
+
       return sheetInfo();
     })
     .then(function(info) {
@@ -35,6 +37,7 @@ function getSheetData() {
     }).then(function(rows) {
       return _.map(rows, function(row) {
         var r = _.cloneDeep(row);
+
         delete r._xml;
         delete r._links;
         delete r.save;
@@ -48,6 +51,7 @@ function getSheetData() {
 
 function makeFullname(user) {
   var name = [];
+
   if (user.firstname) {
     name.push(user.firstname);
   }
@@ -66,11 +70,12 @@ function getCalendarEvents() {
   return q.all(_.map(ids, _.partial(getEvents, jwtClient)))
     .then(function(eventsByCalendar) {
       var allEvents = [];
+
       _.forEach(eventsByCalendar, function(events) {
         allEvents = allEvents.concat(events);
       });
 
-      return allEvents
+      return allEvents;
     });
 }
 
@@ -98,7 +103,7 @@ function getEvents(jwtClient, calendarId) {
         eventCreated: moment(event.created),
         eventUpdated: moment(event.updated),
         eventSummary: event.summary
-      }
+      };
     });
   });
 }

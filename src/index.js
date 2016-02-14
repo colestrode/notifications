@@ -6,7 +6,7 @@ var filters = require('./filters');
 
 return goog.getData()
   .then(filters)
-  .then(function (users) {
+  .then(function(users) {
     return q.all([tw.send(users), sp.send(users)]);
   })
   .then(function() {
