@@ -7,7 +7,7 @@ var moment = require('moment');
 var privateKey = process.env.G_PRIVATE_KEY.replace(/\\n/g, '\n');
 
 module.exports.getData = function() {
-  return q.all([getSheetData(), getCalendarEvents])
+  return q.all([getSheetData(), getCalendarEvents()])
     .spread(function(patients, appointments) {
       // loop through events, if matches a patient, clone patient data and merge with event data
       //
@@ -19,7 +19,7 @@ function getSheetData() {
   var mySheet = new GoogleSpreadsheet(process.env.G_SPREADSHEET);
   var auth = q.nbind(mySheet.useServiceAccountAuth, mySheet);
 
-  return auth({client_email: process.env.GA_EMAIL, private_key: privateKey})
+  return auth({client_email: process.env.G_EMAIL, private_key: privateKey})
     .then(function() {
       var sheetInfo = q.nbind(mySheet.getInfo, mySheet);
       return sheetInfo();
@@ -44,7 +44,7 @@ function getSheetData() {
         return r;
       });
     });
-};
+}
 
 function makeFullname(user) {
   var name = [];
@@ -72,7 +72,7 @@ function getCalendarEvents() {
 
       return allEvents
     });
-};
+}
 
 function getEvents(jwtClient, calendarId) {
   var listEvents = q.nbind(gCalendar.events.list, gCalendar.events);
