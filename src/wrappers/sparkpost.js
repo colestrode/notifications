@@ -1,8 +1,13 @@
+var q = require('q');
+var _ = require('lodash');
 var SparkPost = require('sparkpost');
 var client = new SparkPost(process.env.SPARKPOST_API_KEY, {});
 
-module.exports.send = function(recipients) {
-  client.transmissions.send({
+module.exports.send = function(users) {
+  var send = q.nbind(client.transmissions.send, client.transmissions);
+  var recipients = _.map(users, makeRecipient);
+
+  return send({
     transmissionBody: {
       campaignId: 'patient-reminder',
       content: {
@@ -11,11 +16,14 @@ module.exports.send = function(recipients) {
       recipients: recipients
     },
     'num_rcpt_errors': 10
-  }, function(err) {
-    if (err) {
-      console.log('Error emailing notifications');
-      return console.log(err);
-    }
+  }).then(function() {
     console.log('Email notification sent to ' + recipients.length + ' recipients.');
   });
 };
+
+function makeRecipient(user) {
+  return {
+    address: { name: user.fullname, email: user.email},
+    'substitution_data': _.cloneDeep(user)
+  };
+}

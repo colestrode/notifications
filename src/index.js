@@ -1,30 +1,27 @@
 var sp = require('./wrappers/sparkpost');
 var tw = require('./wrappers/twilio');
 var goog = require('./wrappers/google');
-var _ = require('lodash');
+var q = require('q');
 
-goog.getSheetData()
-  .then(function(rows) {
-    _.forEach(rows, notify);
+goog.getCalendarEvents();
+
+
+/*
+return goog.getSheetData()
+  .then(function (users) {
+    return q.all([tw.send(users), sp.send(users)]);
   })
   .then(function() {
     console.log('done!');
+    process.exit(0);
   })
   .catch(function(err) {
     console.log('there was an error!');
     console.log(err);
+    process.exit(1);
   });
+*/
 
 
-function notify(user) {
-  if (user.phonenumber) {
-    tw.send(user.phonenumber);
-  }
 
-  if (user.email) {
-    sp.send([{
-      address: { name: user.fullname, email: user.email}
-    }]);
-  }
-}
 

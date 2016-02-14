@@ -1,7 +1,9 @@
 var google = require('googleapis');
+var gCalendar = google.calendar('v3');
 var GoogleSpreadsheet = require('google-spreadsheet');
 var _ = require('lodash');
 var q = require('q');
+var moment = require('moment');
 var mySheet = new GoogleSpreadsheet(process.env.GA_SPREADSHEET);
 
 
@@ -51,4 +53,32 @@ function makeFullname(user) {
     name.push(user.lastname);
   }
   return name.join(' ');
+}
+
+
+module.exports.getCalendarEvents = function() {
+  gCalendar.events.list({
+    auth: jwtClient,
+    calendarId: 'primary', // TODO get real calendar
+    timeMin: moment.utc().toISOString(),
+    maxResults: 150,
+    singleEvents: true,
+    orderBy: 'startTime'
+  }, function(err, response) {
+    if (err) {
+      console.log('The API returned an error: ' + err);
+      return;
+    }
+    var events = response.items;
+    if (events.length == 0) {
+      console.log('No upcoming events found.');
+    } else {
+      console.log('Upcoming 10 events:');
+      for (var i = 0; i < events.length; i++) {
+        var event = events[i];
+        var start = event.start.dateTime || event.start.date;
+        console.log('%s - %s', start, event.summary);
+      }
+    }
+  });
 }
