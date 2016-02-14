@@ -11,7 +11,10 @@ var sendMessage = q.nbind(client.sendMessage, client);
  * @returns {*}
  */
 module.exports.send = function(users) {
-  return q.all(_.map(users, sendOne));
+  return q.all(_.map(users, sendOne))
+    .then(function(counts) {
+      console.log('text message sent to ' + _.sum(counts) + ' recipients.');
+    });
 };
 
 /**
@@ -20,16 +23,25 @@ module.exports.send = function(users) {
  * @param user
  */
 function sendOne(user) {
-  if (!user.phonenumber) {
-    return q();
+  if (!user.sendText) {
+    return q(0);
   }
 
-  // TODO sanitize phone number
+  // TODO real message
   return sendMessage({
-    to: '+1' + user.phonenumber,
+    to: '+1' + sanitizeNumber(user.phonenumber),
     from: process.env.TWILIO_NUMBER,
     body: 'word to your mother.'
   }).then(function() {
     console.log('text notification sent');
+    return 1;
+  })
+  .catch(function(err) {
+    console.log('error sending text to user ' + user.id);
+    console.log(err);
   });
+}
+
+function sanitizeNumber(phonenumber) {
+  return phonenumber.replace(/(-)*(\.)*(\s)*/g, '');
 }
