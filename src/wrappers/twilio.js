@@ -27,11 +27,13 @@ function sendOne(recipient) {
     return q(0);
   }
 
-  // TODO real message
+  var message = 'Hi ' + recipient.firstname + ', this is an automatic reminder that you have an appointment with Dawn at '
+    + recipient.niceEventStart + '. I look forward to seeing you then!';
+
   return sendMessage({
     to: '+1' + sanitizeNumber(recipient.phonenumber),
     from: process.env.TWILIO_NUMBER,
-    body: 'word to your mother.'
+    body: message
   }).then(function() {
     return 1;
   })
