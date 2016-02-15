@@ -6,16 +6,41 @@ var q = require('q');
 var moment = require('moment');
 var privateKey = process.env.G_PRIVATE_KEY.replace(/\\n/g, '\n');
 
+/**
+ * Gets all upcoming appointments with patient info
+ *
+ * @returns {Function|*}
+ */
 module.exports.getData = function() {
-  return q.all([getSheetData(), getCalendarEvents()])
-    .spread(function(patients, appointments) {
-      // loop through events, if matches a patient, clone patient data and merge with event data
-      //
-      console.log(appointments);
-      return patients;
-    });
+  return q.all([getCalendarEvents(), getSheetData()]).spread(mergeSheetData);
 };
 
+/**
+ * Merges appointment and patient info
+ * @param appointments
+ * @param patients
+ * @returns {Array}
+ */
+function mergeSheetData(appointments, patients) {
+  var mergedData = [];
+
+  _.forEach(appointments, function(appointment) {
+    var patient = _.find(patients, function(patient) {
+      return new RegExp('\\s' + patient.id + '$', 'i').test(appointment.eventSummary);
+    });
+
+    if (patient) {
+      _.merge(appointment, patient);
+      mergedData.push(appointment);
+    }
+  });
+
+  return mergedData;
+}
+
+/**
+ * Gets patient info from a Google Spreadsheet
+ */
 function getSheetData() {
   var mySheet = new GoogleSpreadsheet(process.env.G_SPREADSHEET);
   var auth = q.nbind(mySheet.useServiceAccountAuth, mySheet);
@@ -49,20 +74,27 @@ function getSheetData() {
     });
 }
 
-function makeFullname(user) {
+/**
+ * Formats the patients first and last name into a full name
+ * @param patient
+ * @returns {string}
+ */
+function makeFullname(patient) {
   var name = [];
 
-  if (user.firstname) {
-    name.push(user.firstname);
+  if (patient.firstname) {
+    name.push(patient.firstname);
   }
 
-  if (user.lastname) {
-    name.push(user.lastname);
+  if (patient.lastname) {
+    name.push(patient.lastname);
   }
   return name.join(' ');
 }
 
-
+/**
+ * Gets all upcoming events for a set of Google calendars
+ */
 function getCalendarEvents() {
   var ids = process.env.G_CALENDAR_IDS.split(',');
   var jwtClient = new google.auth.JWT(process.env.G_EMAIL, null, privateKey, ['https://www.googleapis.com/auth/calendar.readonly'], null);
@@ -79,6 +111,11 @@ function getCalendarEvents() {
     });
 }
 
+/**
+ * Gets all upcoming events for a single Google calendar
+ * @param jwtClient The auth client
+ * @param calendarId
+ */
 function getEvents(jwtClient, calendarId) {
   var listEvents = q.nbind(gCalendar.events.list, gCalendar.events);
 
@@ -97,8 +134,12 @@ function getEvents(jwtClient, calendarId) {
     });
 
     return _.map(creatorEvents, function(event) {
+      var startDate = moment(event.start.dateTime);
+      var niceStart = startDate.format('dddd MMMM Mo [at] hA'); // e.g., 'Monday February 2nd at 2PM'
+
       return {
-        eventStart: moment(event.start.dateTime),
+        eventStart: startDate,
+        niceEventStart: niceStart,
         eventEnd: moment(event.end.dateTime),
         eventCreated: moment(event.created),
         eventUpdated: moment(event.updated),
