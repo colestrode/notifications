@@ -7,7 +7,7 @@ module.exports.send = function(users) {
   var usersToNotify = _.filter(users, 'sendEmail');
   var recipients = _.map(usersToNotify, makeRecipient);
 
-  send(recipients).then(function() {
+  return send(recipients).then(function() {
     console.log('Email notification sent to ' + recipients.length + ' recipients.');
   });
 };
