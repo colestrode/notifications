@@ -26,7 +26,7 @@ function mergeSheetData(appointments, patients) {
 
   _.forEach(appointments, function(appointment) {
     var patient = _.find(patients, function(patient) {
-      return new RegExp('\\s' + patient.id + '$', 'i').test(appointment.eventSummary);
+      return new RegExp('^' + patient.id + '$|\\s' + patient.id + '$', 'i').test(appointment.eventSummary);
     });
 
     if (patient) {
@@ -135,7 +135,7 @@ function getEvents(jwtClient, calendarId) {
 
     return _.map(creatorEvents, function(event) {
       var startDate = moment(event.start.dateTime);
-      var niceStart = startDate.format('dddd MMMM Mo [at] hA'); // e.g., 'Monday February 2nd at 2PM'
+      var niceStart = startDate.format('dddd[,] MMMM Mo [at] hA'); // e.g., 'Monday February 2nd at 2PM'
 
       return {
         eventStart: startDate,

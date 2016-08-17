@@ -3,6 +3,7 @@ var q = require('q');
 var _ = require('lodash');
 var client = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 var sendMessage = q.nbind(client.sendMessage, client);
+var compiledTemplate = _.template(require('../templates/text-reminder.json').template);
 
 /**
  * Sends text messages to an array of users
@@ -27,19 +28,17 @@ function sendOne(recipient) {
     return q(0);
   }
 
-  var message = 'Hi ' + recipient.firstname + ', this is an automatic reminder that you have an appointment with Dawn at '
-    + recipient.niceEventStart + '. I look forward to seeing you then!';
-
   return sendMessage({
     to: '+1' + sanitizeNumber(recipient.phonenumber),
     from: process.env.TWILIO_NUMBER,
-    body: message
+    body: compiledTemplate(recipient)
   }).then(function() {
     return 1;
   })
   .catch(function(err) {
     console.log('error sending text to user ' + recipient.id);
     console.log(err);
+    return 0;
   });
 }
 
