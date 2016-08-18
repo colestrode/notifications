@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "eslint index.js ./src",
+    "test": "eslint index.js ./src --fix",
     "ci": "npm test"
   },
   "repository": {
@@ -25,7 +25,8 @@
     "moment": "^2.11.2",
     "q": "^1.4.1",
     "sparkpost": "^1.1.0",
-    "twilio": "^2.9.0"
+    "twilio": "^2.9.0",
+    "winston": "^2.2.0"
   },
   "devDependencies": {
     "eslint": "^2.0.0"

@@ -1,5 +1,6 @@
 var q = require('q');
 var _ = require('lodash');
+var logger = require('../lib/logger');
 var SparkPost = require('sparkpost');
 var client = new SparkPost(process.env.SPARKPOST_API_KEY, {});
 
@@ -8,7 +9,7 @@ module.exports.send = function(users) {
   var recipients = _.map(usersToNotify, makeRecipient);
 
   return send(recipients).then(function() {
-    console.log('Email notification sent to ' + recipients.length + ' recipients.');
+    logger.info('Email notification sent to ' + recipients.length + ' recipients.');
   });
 };
 
