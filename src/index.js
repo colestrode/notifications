@@ -1,6 +1,7 @@
 var sp = require('./wrappers/sparkpost');
 var tw = require('./wrappers/twilio');
 var goog = require('./wrappers/google');
+var logger = require('./lib/logger');
 var q = require('q');
 var filters = require('./filters');
 
@@ -10,12 +11,12 @@ return goog.getData()
     return q.all([tw.send(users), sp.send(users)]);
   })
   .then(function() {
-    console.log('done!');
+    logger.warn('done sending notifications!');
     process.exit(0);
   })
   .catch(function(err) {
-    console.log('there was an error!');
-    console.log(err);
+    logger.error('there was an error!');
+    logger.error(err);
     process.exit(1);
   });
 
