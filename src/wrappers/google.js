@@ -16,7 +16,7 @@ module.exports.getData = function() {
 };
 
 /**
- * Merges appointment and patient info
+ * Merges appointment with patient info
  * @param appointments
  * @param patients
  * @returns {Array}
@@ -135,11 +135,9 @@ function getEvents(jwtClient, calendarId) {
 
     return _.map(creatorEvents, function(event) {
       var startDate = moment(event.start.dateTime);
-      var niceStart = startDate.format('dddd[,] MMMM Mo [at] hA'); // e.g., 'Monday February 2nd at 2PM'
 
       return {
         eventStart: startDate,
-        niceEventStart: niceStart,
         eventEnd: moment(event.end.dateTime),
         eventCreated: moment(event.created),
         eventUpdated: moment(event.updated),
