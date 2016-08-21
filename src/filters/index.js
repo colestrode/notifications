@@ -1,9 +1,10 @@
 var q = require('q');
 var _ = require('lodash');
 var filters = require('require-all')({
-  dirname:  __dirname,
+  dirname: __dirname,
   recursive: true
 });
+
 delete filters.index;
 
 /**

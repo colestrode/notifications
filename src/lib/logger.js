@@ -18,7 +18,7 @@ var logger = new (winston.Logger)({
           message += '\n' + options.meta.stack.join('\n');
         }
 
-        return  options.level.toUpperCase() + ' ' + options.timestamp() + ' ' + message;
+        return options.level.toUpperCase() + ' ' + options.timestamp() + ' ' + message;
       }
     })
   ]
