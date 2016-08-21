@@ -1,5 +1,11 @@
 var q = require('q');
 var _ = require('lodash');
+var filters = require('require-all')({
+  dirname: __dirname,
+  recursive: true
+});
+
+delete filters.index;
 
 /**
  * Filters can modify or remove any user in the array. They should handle empty arrays.
@@ -11,10 +17,8 @@ var _ = require('lodash');
  * @returns {*}
  */
 module.exports = function(users) {
-  _.each(users, function(user) {
-    user.sendEmail = false;
-    user.sendText = false;
-  });
-
-  return q(users);
+  // processes filters in series
+  return _.reduce(filters, function(promise, filter) {
+    return promise.then(filter);
+  }, q(users));
 };
