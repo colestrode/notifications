@@ -1,7 +1,7 @@
 var winston = require('winston');
 
 // log levels: error, warn, info, verbose, debug, silly
-var logger = new (winston.Logger)({
+module.exports = new (winston.Logger)({
   transports: [
     new (winston.transports.Console)({
       // handle logging uncaughtException
@@ -23,5 +23,3 @@ var logger = new (winston.Logger)({
     })
   ]
 });
-
-module.exports = logger;
