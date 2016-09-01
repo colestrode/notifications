@@ -8,7 +8,7 @@ var sendTransmission = q.nbind(client.transmissions.send, client.transmissions);
 module.exports.send = function(users) {
   var usersToNotify = getUsersToNotify(users);
   var groupedUsers = groupUsers(usersToNotify);
-  var templates = _.keys(groupedUsers);
+  var templates = _.keys(groupedUsers).sort(); // sort to make this deterministic for testing
 
   return q.all(_.map(templates, function(template) {
     return send(template, groupedUsers[template]);
@@ -41,10 +41,6 @@ function groupUsers(users) {
  * Sends an email to a set of users using the given template ID
  */
 function send(templateId, users) {
-  if (!users.length) {
-    return q();
-  }
-
   return sendTransmission({
     transmissionBody: {
       campaignId: 'patient-reminder',
