@@ -9,8 +9,8 @@ module.exports = new (winston.Logger)({
       humanReadableUnhandledException: true,
       formatter: function(options) {
         // Return string will be passed to logger.
-        var message = (options.message ? options.message : '')
-          , now = new Date().toISOString();
+        var message = (options.message ? options.message : '');
+        var now = new Date().toISOString();
 
         if (options.meta && options.meta.stack) {
           message += '\n' + options.meta.stack.join('\n');
