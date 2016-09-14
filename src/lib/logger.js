@@ -7,18 +7,16 @@ module.exports = new (winston.Logger)({
       // handle logging uncaughtException
       handleExceptions: true,
       humanReadableUnhandledException: true,
-      timestamp: function() {
-        return new Date().toISOString();
-      },
       formatter: function(options) {
         // Return string will be passed to logger.
-        var message = (options.message ? options.message : '');
+        var message = (options.message ? options.message : '')
+          , now = new Date().toISOString();
 
         if (options.meta && options.meta.stack) {
           message += '\n' + options.meta.stack.join('\n');
         }
 
-        return options.level.toUpperCase() + ' ' + options.timestamp() + ' ' + message;
+        return options.level.toUpperCase() + ' ' + now + ' ' + message;
       }
     })
   ]
