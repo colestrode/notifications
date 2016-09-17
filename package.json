@@ -4,7 +4,8 @@
   "description": "Notifications based on Google Calendar using SparkPost and Twilio",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "echo": "echo 'deploy successful' && exit 0",
+    "notify": "node index.js",
     "pretest": "eslint index.js src/ test/",
     "test": "istanbul cover --report lcov --dir ./coverage/ _mocha --recursive ./test --grep ./test/**/*.spec.js -- --colors --reporter spec",
     "ci": "npm test && cat ./coverage/lcov.info | coveralls"
