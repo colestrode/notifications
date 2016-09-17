@@ -10,6 +10,9 @@
     "test": "istanbul cover --report lcov --dir ./coverage/ _mocha --recursive ./test --grep ./test/**/*.spec.js -- --colors --reporter spec",
     "ci": "npm test && cat ./coverage/lcov.info | coveralls"
   },
+  "engines": {
+    "npm": ">=2.0.0 <3.0.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/colestrode/notifications.git"
