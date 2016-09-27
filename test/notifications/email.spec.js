@@ -1,19 +1,19 @@
 'use strict';
 
-var chai = require('chai');
-var expect = chai.expect;
-var sinon = require('sinon');
-var proxyquire = require('proxyquire').noCallThru();
-var _ = require('lodash');
+const chai = require('chai');
+const expect = chai.expect;
+const sinon = require('sinon');
+const proxyquire = require('proxyquire').noCallThru();
+const _ = require('lodash');
 
 chai.use(require('sinon-chai'));
 
 describe('Wrappers: SparkPost', function() {
-  var loggerMock;
-  var varsMock;
-  var sparkPostMock;
-  var sparkpostClientMock;
-  var wrapper;
+  let loggerMock;
+  let varsMock;
+  let sparkPostMock;
+  let sparkpostClientMock;
+  let wrapper;
 
   beforeEach(function() {
     loggerMock = {
@@ -46,7 +46,7 @@ describe('Wrappers: SparkPost', function() {
   });
 
   it('should group and send to recipients', function() {
-    var recipients = [{
+    const recipients = [{
       isNew: false,
       twoDays: true,
       fullname: 'Walter White',
@@ -62,9 +62,9 @@ describe('Wrappers: SparkPost', function() {
 
     return wrapper.send(recipients)
       .then(function() {
-        var firstCallArg;
-        var secondCallArg;
-        var recipients;
+        let firstCallArg;
+        let secondCallArg;
+        let recipients;
 
         expect(sparkpostClientMock.transmissions.send).to.have.been.calledTwice;
         expect(loggerMock.info).to.have.been.calledOnce;
@@ -95,8 +95,8 @@ describe('Wrappers: SparkPost', function() {
   });
 
   it('should send new email over reminder email', function() {
-    var firstCallArg;
-    var recipients = [{
+    let firstCallArg;
+    const recipients = [{
       isNew: true,
       twoDays: true,
       fullname: 'Walter White',
@@ -105,7 +105,7 @@ describe('Wrappers: SparkPost', function() {
     }];
 
     return wrapper.send(recipients)
-      .then(function() {
+      .then(() => {
         expect(sparkpostClientMock.transmissions.send).to.have.been.calledOnce;
 
         firstCallArg = sparkpostClientMock.transmissions.send.args[0][0];
@@ -114,7 +114,7 @@ describe('Wrappers: SparkPost', function() {
   });
 
   it('should ignore recipients who do not need a new or reminder email', function() {
-    var recipients = [{
+    const recipients = [{
       isNew: false,
       twoDays: false,
       fullname: 'Walter White',
@@ -123,13 +123,13 @@ describe('Wrappers: SparkPost', function() {
     }];
 
     return wrapper.send(recipients)
-      .then(function() {
+      .then(() => {
         expect(sparkpostClientMock.transmissions.send).not.to.have.been.called;
       });
   });
 
   it('should reject if there is an error', function() {
-    var error = new Error('GUSFRING');
+    const error = new Error('GUSFRING');
 
     sparkpostClientMock.transmissions.send.yields(error);
     return wrapper.send([{
@@ -139,10 +139,10 @@ describe('Wrappers: SparkPost', function() {
       email: 'walterwhite@jpwynnehs.gov',
       secretname: 'heisenberg'
     }])
-      .then(function() {
+      .then(() => {
         throw new Error('DIDNOTREJECT');
       })
-      .catch(function(err) {
+      .catch((err) => {
         expect(err).to.equal(error);
       });
   });

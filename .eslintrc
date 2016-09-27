@@ -1,7 +1,11 @@
 {
   "extends": "sparkpost/api",
   "rules": {
-    "strict": ["error", "global"],
-    "one-var": ["off"]
+    "strict": ["off"],
+    "one-var": ["error", {
+      "var": "never",
+      "let": "never",
+      "const": "never"
+    }]
   }
 }
