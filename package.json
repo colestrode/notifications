@@ -48,8 +48,7 @@
     "sinon": "^1.17.5",
     "sinon-as-promised": "^4.0.2",
     "sinon-chai": "^2.8.0",
-    "standard": "^8.2.0",
-    "standard-packages": "^3.1.17"
+    "standard": "^8.2.0"
   },
   "standard": {
     "globals": [
