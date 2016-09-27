@@ -1,17 +1,17 @@
-var sp = require('./wrappers/sparkpost');
-// var tw = require('./wrappers/twilio');
-var goog = require('./wrappers/google');
+var email = require('./notifications/email');
+// var text = require('./notifications/text');
+var data = require('./data');
 var logger = require('./lib/logger');
 var q = require('q');
-var filters = require('./filters');
+var transforms = require('./transforms');
 
 module.exports = function() {
-  return goog.getData()
-    .then(filters)
-    .then(function(users) {
+  return data.getData()
+    .then(transforms)
+    .then(function(recipients) {
       return q.all([
-        // tw.send(users),
-        sp.send(users)
+        // text.send(recipients),
+        email.send(recipients)
       ]);
     })
     .then(function() {

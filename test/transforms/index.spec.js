@@ -29,7 +29,7 @@ describe('filter: index', function() {
 
     requireAllMock = sinon.stub().returns(allFilters);
 
-    filter = proxyquire('../../src/filters/index', {
+    filter = proxyquire('../../src/transforms/index', {
       'require-all': requireAllMock
     });
   });
@@ -41,12 +41,12 @@ describe('filter: index', function() {
       });
   });
 
-  it('should pass users through all filters in sequence', function() {
+  it('should pass recipients through all filters in sequence', function() {
     return filter([])
-      .then(function(users) {
-        expect(users).to.have.length(2);
-        expect(users).to.contain('filter1');
-        expect(users).to.contain('filter2');
+      .then(function(recipients) {
+        expect(recipients).to.have.length(2);
+        expect(recipients).to.contain('filter1');
+        expect(recipients).to.contain('filter2');
       });
   });
 

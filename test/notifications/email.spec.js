@@ -10,6 +10,7 @@ chai.use(require('sinon-chai'));
 
 describe('Wrappers: SparkPost', function() {
   var loggerMock;
+  var varsMock;
   var sparkPostMock;
   var sparkpostClientMock;
   var wrapper;
@@ -19,7 +20,11 @@ describe('Wrappers: SparkPost', function() {
       info: sinon.stub()
     };
 
-    process.env.SPARKPOST_API_KEY = 'SPARKPOST_API_KEY';
+    varsMock = {
+      sparkpost: {
+        apiKey: 'SPARKPOST_API_KEY'
+      }
+    };
 
     sparkpostClientMock = {
       transmissions: {
@@ -29,9 +34,10 @@ describe('Wrappers: SparkPost', function() {
 
     sparkPostMock = sinon.stub().returns(sparkpostClientMock);
 
-    wrapper = proxyquire('../../src/wrappers/sparkpost', {
+    wrapper = proxyquire('../../src/notifications/email', {
       sparkpost: sparkPostMock,
-      '../lib/logger': loggerMock
+      '../lib/logger': loggerMock,
+      '../lib/vars': varsMock
     });
   });
 
@@ -39,8 +45,8 @@ describe('Wrappers: SparkPost', function() {
     expect(sparkPostMock).to.have.been.calledWith('SPARKPOST_API_KEY');
   });
 
-  it('should group and send to users', function() {
-    var users = [{
+  it('should group and send to recipients', function() {
+    var recipients = [{
       isNew: false,
       twoDays: true,
       fullname: 'Walter White',
@@ -54,7 +60,7 @@ describe('Wrappers: SparkPost', function() {
       secretname: 'capncook'
     }];
 
-    return wrapper.send(users)
+    return wrapper.send(recipients)
       .then(function() {
         var firstCallArg;
         var secondCallArg;
@@ -90,7 +96,7 @@ describe('Wrappers: SparkPost', function() {
 
   it('should send new email over reminder email', function() {
     var firstCallArg;
-    var users = [{
+    var recipients = [{
       isNew: true,
       twoDays: true,
       fullname: 'Walter White',
@@ -98,7 +104,7 @@ describe('Wrappers: SparkPost', function() {
       secretname: 'heisenberg'
     }];
 
-    return wrapper.send(users)
+    return wrapper.send(recipients)
       .then(function() {
         expect(sparkpostClientMock.transmissions.send).to.have.been.calledOnce;
 
@@ -107,8 +113,8 @@ describe('Wrappers: SparkPost', function() {
       });
   });
 
-  it('should ignore users who do not need a new or reminder email', function() {
-    var users = [{
+  it('should ignore recipients who do not need a new or reminder email', function() {
+    var recipients = [{
       isNew: false,
       twoDays: false,
       fullname: 'Walter White',
@@ -116,7 +122,7 @@ describe('Wrappers: SparkPost', function() {
       secretname: 'heisenberg'
     }];
 
-    return wrapper.send(users)
+    return wrapper.send(recipients)
       .then(function() {
         expect(sparkpostClientMock.transmissions.send).not.to.have.been.called;
       });

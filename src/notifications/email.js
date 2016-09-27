@@ -1,0 +1,65 @@
+var q = require('q');
+var _ = require('lodash');
+var logger = require('../lib/logger');
+var vars = require('../lib/vars');
+var SparkPost = require('sparkpost');
+var client = new SparkPost(vars.sparkpost.apiKey, {});
+var sendTransmission = q.nbind(client.transmissions.send, client.transmissions);
+
+module.exports.send = function(recipients) {
+  var recipientsToNotify = getRecipientsToNotify(recipients);
+  var groupedRecipients = groupRecipients(recipientsToNotify);
+  var templates = _.keys(groupedRecipients).sort(); // sort to make this deterministic for testing
+
+  return q.all(_.map(templates, function(template) {
+    return send(template, groupedRecipients[template]);
+  })).then(function() {
+    logger.info('Email notification sent to ' + recipientsToNotify.length + ' recipients.');
+  });
+};
+
+/**
+ * Given a list of recipients, returns a new array of recipients that should be notified.
+ *
+ * recipients that should be notified are either new recipients or who have an appointment two days from now
+ */
+function getRecipientsToNotify(recipients) {
+  return _.filter(recipients, function(recipient) {
+    return recipient.isNew || recipient.twoDays;
+  });
+}
+
+/**
+ * Groups recipients by template
+ */
+function groupRecipients(recipients) {
+  return _.groupBy(recipients, function(recipient) {
+    return recipient.isNew ? 'new-appointment' : 'appointment-reminder';
+  });
+}
+
+/**
+ * Sends an email to a set of recipients using the given template ID
+ */
+function send(templateId, recipients) {
+  return sendTransmission({
+    transmissionBody: {
+      campaignId: 'patient-reminder',
+      content: {
+        templateId: templateId
+      },
+      recipients: _.map(recipients, makeRecipient)
+    },
+    'num_rcpt_errors': 10
+  });
+}
+
+/**
+ * Formats a recipient into a SparkPost recipient
+ */
+function makeRecipient(recipient) {
+  return {
+    address: { name: recipient.fullname, email: recipient.email},
+    'substitution_data': _.cloneDeep(recipient)
+  };
+}

@@ -7,9 +7,9 @@ var sendMessage = q.nbind(client.sendMessage, client);
 var compiledTemplate = _.template(require('../templates/text-reminder.json').template);
 
 /**
- * Sends text messages to an array of users
+ * Sends text messages to an array of recipients
  *
- * @param users
+ * @param recipients
  * @returns {*}
  */
 module.exports.send = function(recipients) {
@@ -20,7 +20,7 @@ module.exports.send = function(recipients) {
 };
 
 /**
- * Sends a text message to a single user
+ * Sends a text message to a single recipient
  *
  * @param recipient
  */
@@ -37,7 +37,7 @@ function sendOne(recipient) {
     return 1;
   })
   .catch(function(err) {
-    logger.error('error sending text to user ' + recipient.id);
+    logger.error('error sending text to recipient ' + recipient.id);
     logger.error(err);
     return 0;
   });

@@ -9,10 +9,10 @@ chai.use(require('sinon-chai'));
 
 describe('Notifications', function() {
   var exitOrig;
-  var users;
-  var filtersMock;
-  var googleMock;
-  var sparkPostMock;
+  var recipients;
+  var transformsMock;
+  var dataMock;
+  var emailMock;
   var loggerMock;
   var notifier;
   var error;
@@ -21,15 +21,15 @@ describe('Notifications', function() {
     exitOrig = process.exit;
     process.exit = sinon.stub();
 
-    users = [];
+    recipients = [];
 
-    filtersMock = sinon.stub().returnsArg(0);
+    transformsMock = sinon.stub().returnsArg(0);
 
-    googleMock = {
-      getData: sinon.stub().resolves(users)
+    dataMock = {
+      getData: sinon.stub().resolves(recipients)
     };
 
-    sparkPostMock = {
+    emailMock = {
       send: sinon.stub().resolves()
     };
 
@@ -41,10 +41,10 @@ describe('Notifications', function() {
     error = new Error('OHBOYMORTY');
 
     notifier = proxyquire('../src', {
-      './wrappers/sparkpost': sparkPostMock,
-      './wrappers/google': googleMock,
+      './notifications/email': emailMock,
+      './data': dataMock,
       './lib/logger': loggerMock,
-      './filters': filtersMock
+      './transforms': transformsMock
     });
   });
 
@@ -55,45 +55,45 @@ describe('Notifications', function() {
   it('should send notifications', function() {
     return notifier()
       .then(function() {
-        expect(googleMock.getData).to.have.been.called;
-        expect(filtersMock).to.have.been.calledWith(users);
-        expect(sparkPostMock.send).to.have.been.calledWith(users);
+        expect(dataMock.getData).to.have.been.called;
+        expect(transformsMock).to.have.been.calledWith(recipients);
+        expect(emailMock.send).to.have.been.calledWith(recipients);
         expect(loggerMock.warn).to.have.been.called;
         expect(process.exit).to.have.been.calledWith(0);
       });
   });
 
   it('should log error if getting Google data fails', function() {
-    googleMock.getData.rejects(error);
+    dataMock.getData.rejects(error);
     return notifier()
       .then(function() {
-        expect(googleMock.getData).to.have.been.called;
-        expect(filtersMock).not.to.have.been.called;
-        expect(sparkPostMock.send).not.to.have.been.called;
+        expect(dataMock.getData).to.have.been.called;
+        expect(transformsMock).not.to.have.been.called;
+        expect(emailMock.send).not.to.have.been.called;
         expect(loggerMock.error).to.have.been.calledWith(error);
         expect(process.exit).to.have.been.calledWith(1);
       });
   });
 
   it('should log error if filter fails', function() {
-    filtersMock.throws(error);
+    transformsMock.throws(error);
     return notifier()
       .then(function() {
-        expect(googleMock.getData).to.have.been.called;
-        expect(filtersMock).to.have.been.called;
-        expect(sparkPostMock.send).not.to.have.been.called;
+        expect(dataMock.getData).to.have.been.called;
+        expect(transformsMock).to.have.been.called;
+        expect(emailMock.send).not.to.have.been.called;
         expect(loggerMock.error).to.have.been.calledWith(error);
         expect(process.exit).to.have.been.calledWith(1);
       });
   });
 
   it('should log error if sending with SparkPost fails', function() {
-    sparkPostMock.send.rejects(error);
+    emailMock.send.rejects(error);
     return notifier()
       .then(function() {
-        expect(googleMock.getData).to.have.been.called;
-        expect(filtersMock).to.have.been.called;
-        expect(sparkPostMock.send).to.have.been.called;
+        expect(dataMock.getData).to.have.been.called;
+        expect(transformsMock).to.have.been.called;
+        expect(emailMock.send).to.have.been.called;
         expect(loggerMock.error).to.have.been.calledWith(error);
         expect(process.exit).to.have.been.calledWith(1);
       });
