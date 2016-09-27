@@ -6,7 +6,7 @@
   "scripts": {
     "echo": "echo 'deploy successful' && exit 0",
     "notify": "node index.js",
-    "pretest": "eslint index.js src/ test/",
+    "pretest": "eslint index.js src/ test/ --fix",
     "test": "istanbul cover --report lcov --dir ./coverage/ _mocha --recursive ./test --grep ./test/**/*.spec.js -- --colors --reporter spec",
     "ci": "npm test && cat ./coverage/lcov.info | coveralls"
   },
@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/colestrode/notifications#readme",
   "dependencies": {
+    "eslint-config-sparkpost": "^1.1.0",
     "google-spreadsheet": "^1.1.4",
     "googleapis": "^2.1.7",
     "lodash": "^4.3.0",
@@ -37,7 +38,7 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "coveralls": "^2.11.12",
-    "eslint": "^2.0.0",
+    "eslint": "^3.6.1",
     "istanbul": "^0.4.4",
     "mocha": "^3.0.2",
     "proxyquire": "^1.7.10",

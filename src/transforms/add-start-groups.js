@@ -1,10 +1,12 @@
-var _ = require('lodash');
-var q = require('q');
-var moment = require('moment');
-var now = moment().startOf('minute');
+'use strict';
+
+const _ = require('lodash');
+const q = require('q');
+const moment = require('moment');
+const now = moment().startOf('minute');
 
 module.exports = function(recipients) {
-  return q.all(_.map(recipients, function(recipient) {
+  return q.all(_.map(recipients, (recipient) => {
     recipient.isNew = recipient.eventCreated.isBetween(subtractHours(now, 1), now);
     recipient.oneDay = recipient.eventStart.isBetween(addHours(now, 23), addHours(now, 24));
     recipient.twoDays = recipient.eventStart.isBetween(addHours(now, 47), addHours(now, 48));

@@ -1,10 +1,12 @@
+'use strict';
+
 //require the Twilio module and create a REST client
-var q = require('q');
-var _ = require('lodash');
-var logger = require('../lib/logger');
-var client = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-var sendMessage = q.nbind(client.sendMessage, client);
-var compiledTemplate = _.template(require('../templates/text-reminder.json').template);
+const q = require('q');
+const _ = require('lodash');
+const logger = require('../lib/logger');
+const client = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+const sendMessage = q.nbind(client.sendMessage, client);
+const compiledTemplate = _.template(require('../templates/text-reminder.json').template);
 
 /**
  * Sends text messages to an array of recipients
@@ -14,7 +16,7 @@ var compiledTemplate = _.template(require('../templates/text-reminder.json').tem
  */
 module.exports.send = function(recipients) {
   return q.all(_.map(recipients, sendOne))
-    .then(function(counts) {
+    .then((counts) => {
       logger.info('text message sent to ' + _.sum(counts) + ' recipients.');
     });
 };
@@ -33,10 +35,10 @@ function sendOne(recipient) {
     to: '+1' + sanitizeNumber(recipient.phonenumber),
     from: process.env.TWILIO_NUMBER,
     body: compiledTemplate(recipient)
-  }).then(function() {
+  }).then(() => {
     return 1;
   })
-  .catch(function(err) {
+  .catch((err) => {
     logger.error('error sending text to recipient ' + recipient.id);
     logger.error(err);
     return 0;

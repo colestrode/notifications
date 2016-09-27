@@ -1,6 +1,8 @@
-var q = require('q');
-var _ = require('lodash');
-var filters = require('require-all')({
+'use strict';
+
+const q = require('q');
+const _ = require('lodash');
+const filters = require('require-all')({
   dirname: __dirname,
   recursive: true
 });
@@ -18,7 +20,7 @@ delete filters.index;
  */
 module.exports = function(recipients) {
   // processes filters in series
-  return _.reduce(filters, function(promise, filter) {
+  return _.reduce(filters, (promise, filter) => {
     return promise.then(filter);
   }, q(recipients));
 };
