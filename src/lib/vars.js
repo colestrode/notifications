@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = {
   google: {
     privateKey: process.env.G_PRIVATE_KEY.replace(/\\n/g, '\n'),

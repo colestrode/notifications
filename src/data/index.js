@@ -1,7 +1,9 @@
-var _ = require('lodash');
-var q = require('q');
-var events = require('./events');
-var recipientData = require('./recipient-data');
+'use strict';
+
+const _ = require('lodash');
+const q = require('q');
+const events = require('./events');
+const recipientData = require('./recipient-data');
 
 /**
  * Gets all upcoming appointments with recipient info
@@ -19,10 +21,10 @@ module.exports.getData = function() {
  * @returns {Array}
  */
 function mergeSheetData(events, recipientData) {
-  var mergedData = [];
+  const mergedData = [];
 
   _.forEach(events, function(appointment) {
-    var patient = _.find(recipientData, function(recipient) {
+    const patient = _.find(recipientData, function(recipient) {
       return new RegExp('^' + recipient.id + '$|\\s' + recipient.id + '$', 'i').test(appointment.eventSummary);
     });
 

@@ -1,19 +1,21 @@
-var q = require('q');
-var _ = require('lodash');
-var logger = require('../lib/logger');
-var vars = require('../lib/vars');
-var SparkPost = require('sparkpost');
-var client = new SparkPost(vars.sparkpost.apiKey, {});
-var sendTransmission = q.nbind(client.transmissions.send, client.transmissions);
+'use strict';
+
+const q = require('q');
+const _ = require('lodash');
+const logger = require('../lib/logger');
+const vars = require('../lib/vars');
+const SparkPost = require('sparkpost');
+const client = new SparkPost(vars.sparkpost.apiKey, {});
+const sendTransmission = q.nbind(client.transmissions.send, client.transmissions);
 
 module.exports.send = function(recipients) {
-  var recipientsToNotify = getRecipientsToNotify(recipients);
-  var groupedRecipients = groupRecipients(recipientsToNotify);
-  var templates = _.keys(groupedRecipients).sort(); // sort to make this deterministic for testing
+  const recipientsToNotify = getRecipientsToNotify(recipients);
+  const groupedRecipients = groupRecipients(recipientsToNotify);
+  const templates = _.keys(groupedRecipients).sort(); // sort to make this deterministic for testing
 
-  return q.all(_.map(templates, function(template) {
+  return q.all(_.map(templates, (template) => {
     return send(template, groupedRecipients[template]);
-  })).then(function() {
+  })).then(() => {
     logger.info('Email notification sent to ' + recipientsToNotify.length + ' recipients.');
   });
 };
@@ -24,7 +26,7 @@ module.exports.send = function(recipients) {
  * recipients that should be notified are either new recipients or who have an appointment two days from now
  */
 function getRecipientsToNotify(recipients) {
-  return _.filter(recipients, function(recipient) {
+  return _.filter(recipients, (recipient) => {
     return recipient.isNew || recipient.twoDays;
   });
 }
@@ -33,7 +35,7 @@ function getRecipientsToNotify(recipients) {
  * Groups recipients by template
  */
 function groupRecipients(recipients) {
-  return _.groupBy(recipients, function(recipient) {
+  return _.groupBy(recipients, (recipient) => {
     return recipient.isNew ? 'new-appointment' : 'appointment-reminder';
   });
 }

@@ -1,33 +1,32 @@
-var GoogleSpreadsheet = require('google-spreadsheet');
-var _ = require('lodash');
-var q = require('q');
-var vars = require('./../lib/vars');
+'use strict';
+
+const GoogleSpreadsheet = require('google-spreadsheet');
+const _ = require('lodash');
+const q = require('q');
+const vars = require('./../lib/vars');
+const dataSheet = new GoogleSpreadsheet(vars.google.spreadsheet);
+const authorize = q.nbind(dataSheet.useServiceAccountAuth, dataSheet);
+const getSheetInfo = q.nbind(dataSheet.getInfo, dataSheet);
 
 
 /**
  * Gets patient info from a Google Spreadsheet
  */
 module.exports.getRecpientData = function() {
-  var mySheet = new GoogleSpreadsheet(vars.google.spreadsheet);
-  var auth = q.nbind(mySheet.useServiceAccountAuth, mySheet);
 
-  return auth({'client_email': vars.google.email, 'private_key': vars.google.privateKey})
-    .then(function() {
-      var sheetInfo = q.nbind(mySheet.getInfo, mySheet);
-
-      return sheetInfo();
-    })
-    .then(function(info) {
-      var worksheet = _.find(info.worksheets, {title: 'patients'});
-      var getRows = q.nbind(worksheet.getRows, worksheet);
+  return authorize({'client_email': vars.google.email, 'private_key': vars.google.privateKey})
+    .then(getSheetInfo)
+    .then((info) => {
+      const worksheet = _.find(info.worksheets, {title: 'recipients'});
+      const getRows = q.nbind(worksheet.getRows, worksheet);
 
       return getRows({
         offset: 0,
         limit: 1000
       });
-    }).then(function(rows) {
+    }).then((rows) => {
       return _.map(rows, function(row) {
-        var r = _.cloneDeep(row);
+        const r = _.cloneDeep(row);
 
         delete r._xml;
         delete r._links;
@@ -46,7 +45,7 @@ module.exports.getRecpientData = function() {
  * @returns {string}
  */
 function makeFullname(patient) {
-  var name = [];
+  const name = [];
 
   if (patient.firstname) {
     name.push(patient.firstname);

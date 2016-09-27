@@ -1,24 +1,26 @@
-var email = require('./notifications/email');
-// var text = require('./notifications/text');
-var data = require('./data');
-var logger = require('./lib/logger');
-var q = require('q');
-var transforms = require('./transforms');
+'use strict';
+
+const email = require('./notifications/email');
+// const text = require('./notifications/text');
+const data = require('./data');
+const logger = require('./lib/logger');
+const q = require('q');
+const transforms = require('./transforms');
 
 module.exports = function() {
   return data.getData()
     .then(transforms)
-    .then(function(recipients) {
+    .then((recipients) => {
       return q.all([
         // text.send(recipients),
         email.send(recipients)
       ]);
     })
-    .then(function() {
+    .then(() => {
       logger.warn('done sending notifications!');
       process.exit(0);
     })
-    .catch(function(err) {
+    .catch((err) => {
       logger.error(err);
       process.exit(1);
     });

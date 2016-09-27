@@ -1,21 +1,21 @@
 'use strict';
 
-var chai = require('chai');
-var expect = chai.expect;
-var sinon = require('sinon');
-var proxyquire = require('proxyquire').noCallThru();
+const chai = require('chai');
+const expect = chai.expect;
+const sinon = require('sinon');
+const proxyquire = require('proxyquire').noCallThru();
 
 chai.use(require('sinon-chai'));
 
 describe('Notifications', function() {
-  var exitOrig;
-  var recipients;
-  var transformsMock;
-  var dataMock;
-  var emailMock;
-  var loggerMock;
-  var notifier;
-  var error;
+  let exitOrig;
+  let recipients;
+  let transformsMock;
+  let dataMock;
+  let emailMock;
+  let loggerMock;
+  let notifier;
+  let error;
 
   beforeEach(function() {
     exitOrig = process.exit;
@@ -54,7 +54,7 @@ describe('Notifications', function() {
 
   it('should send notifications', function() {
     return notifier()
-      .then(function() {
+      .then(() => {
         expect(dataMock.getData).to.have.been.called;
         expect(transformsMock).to.have.been.calledWith(recipients);
         expect(emailMock.send).to.have.been.calledWith(recipients);
@@ -66,7 +66,7 @@ describe('Notifications', function() {
   it('should log error if getting Google data fails', function() {
     dataMock.getData.rejects(error);
     return notifier()
-      .then(function() {
+      .then(() => {
         expect(dataMock.getData).to.have.been.called;
         expect(transformsMock).not.to.have.been.called;
         expect(emailMock.send).not.to.have.been.called;
@@ -78,7 +78,7 @@ describe('Notifications', function() {
   it('should log error if filter fails', function() {
     transformsMock.throws(error);
     return notifier()
-      .then(function() {
+      .then(() => {
         expect(dataMock.getData).to.have.been.called;
         expect(transformsMock).to.have.been.called;
         expect(emailMock.send).not.to.have.been.called;
@@ -90,7 +90,7 @@ describe('Notifications', function() {
   it('should log error if sending with SparkPost fails', function() {
     emailMock.send.rejects(error);
     return notifier()
-      .then(function() {
+      .then(() => {
         expect(dataMock.getData).to.have.been.called;
         expect(transformsMock).to.have.been.called;
         expect(emailMock.send).to.have.been.called;

@@ -1,17 +1,17 @@
 'use strict';
 
-var chai = require('chai');
-var expect = chai.expect;
-var sinon = require('sinon');
-var proxyquire = require('proxyquire').noCallThru();
-var q = require('q');
+const chai = require('chai');
+const expect = chai.expect;
+const sinon = require('sinon');
+const proxyquire = require('proxyquire').noCallThru();
+const q = require('q');
 
 describe('filter: index', function() {
-  var filter;
-  var filter1;
-  var filter2;
-  var allFilters;
-  var requireAllMock;
+  let filter;
+  let filter1;
+  let filter2;
+  let allFilters;
+  let requireAllMock;
 
   beforeEach(function() {
     filter1 = sinon.spy(function(u) {
@@ -36,14 +36,14 @@ describe('filter: index', function() {
 
   it('should remove index', function() {
     return filter([])
-      .then(function() {
+      .then(() => {
         expect(allFilters.index).not.to.exist;
       });
   });
 
   it('should pass recipients through all filters in sequence', function() {
     return filter([])
-      .then(function(recipients) {
+      .then((recipients) => {
         expect(recipients).to.have.length(2);
         expect(recipients).to.contain('filter1');
         expect(recipients).to.contain('filter2');
@@ -51,15 +51,15 @@ describe('filter: index', function() {
   });
 
   it('should reject if a filter fails', function() {
-    var error = new Error('GUSFRING');
+    const error = new Error('GUSFRING');
 
     allFilters.filter1 = sinon.stub().rejects(error);
 
     return filter([])
-      .then(function() {
+      .then(() => {
         throw new Error('should have failed!');
       })
-      .catch(function(err) {
+      .catch((err) => {
         expect(err).to.equal(error);
       });
   });
