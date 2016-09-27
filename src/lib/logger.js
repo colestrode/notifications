@@ -1,6 +1,6 @@
-'use strict';
+'use strict'
 
-const winston = require('winston');
+const winston = require('winston')
 
 // log levels: error, warn, info, verbose, debug, silly
 module.exports = new (winston.Logger)({
@@ -11,15 +11,15 @@ module.exports = new (winston.Logger)({
       humanReadableUnhandledException: true,
       formatter: (options) => {
         // Return string will be passed to logger.
-        let message = (options.message ? options.message : '');
-        const now = new Date().toISOString();
+        let message = (options.message ? options.message : '')
+        const now = new Date().toISOString()
 
         if (options.meta && options.meta.stack) {
-          message += '\n' + options.meta.stack.join('\n');
+          message += '\n' + options.meta.stack.join('\n')
         }
 
-        return options.level.toUpperCase() + ' ' + now + ' ' + message;
+        return options.level.toUpperCase() + ' ' + now + ' ' + message
       }
     })
   ]
-});
+})

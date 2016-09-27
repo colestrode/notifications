@@ -1,38 +1,37 @@
-'use strict';
+'use strict'
 
-const google = require('googleapis');
-const gCalendar = google.calendar('v3');
-const _ = require('lodash');
-const q = require('q');
-const moment = require('moment');
-const vars = require('./../lib/vars');
-
+const google = require('googleapis')
+const gCalendar = google.calendar('v3')
+const _ = require('lodash')
+const q = require('q')
+const moment = require('moment')
+const vars = require('./../lib/vars')
 
 /**
  * Gets all upcoming events for a set of Google calendars
  */
-module.exports.getEvents = function() {
-  const jwtClient = new google.auth.JWT(vars.google.email, null, vars.google.privateKey, ['https://www.googleapis.com/auth/calendar.readonly'], null);
+module.exports.getEvents = function () {
+  const jwtClient = new google.auth.JWT(vars.google.email, null, vars.google.privateKey, ['https://www.googleapis.com/auth/calendar.readonly'], null)
 
   return q.all(_.map(vars.google.calendarIds, _.partial(getEvents, jwtClient)))
     .then((eventsByCalendar) => {
-      let allEvents = [];
+      let allEvents = []
 
-      _.forEach(eventsByCalendar, function(events) {
-        allEvents = allEvents.concat(events);
-      });
+      _.forEach(eventsByCalendar, function (events) {
+        allEvents = allEvents.concat(events)
+      })
 
-      return allEvents;
-    });
-};
+      return allEvents
+    })
+}
 
 /**
  * Gets all upcoming events for a single Google calendar
  * @param jwtClient The auth client
  * @param calendarId
  */
-function getEvents(jwtClient, calendarId) {
-  const listEvents = q.nbind(gCalendar.events.list, gCalendar.events);
+function getEvents (jwtClient, calendarId) {
+  const listEvents = q.nbind(gCalendar.events.list, gCalendar.events)
 
   // will return up to 250 events, this should be plenty :D
   return listEvents({
@@ -43,14 +42,14 @@ function getEvents(jwtClient, calendarId) {
     singleEvents: true,
     orderBy: 'startTime'
   }).then((response) => {
-    const events = response[0].items;
-    const creatorEvents = _.filter(events, function(event) {
+    const events = response[0].items
+    const creatorEvents = _.filter(events, function (event) {
       // pull events for the creator if creator is defined, else pull all events
-      return vars.google.calendarCreator ? event.creator.email === vars.google.calendarCreator : true;
-    });
+      return vars.google.calendarCreator ? event.creator.email === vars.google.calendarCreator : true
+    })
 
-    return _.map(creatorEvents, function(event) {
-      const startDate = moment(event.start.dateTime);
+    return _.map(creatorEvents, function (event) {
+      const startDate = moment(event.start.dateTime)
 
       return {
         eventStart: startDate,
@@ -58,7 +57,7 @@ function getEvents(jwtClient, calendarId) {
         eventCreated: moment(event.created),
         eventUpdated: moment(event.updated),
         eventSummary: event.summary
-      };
-    });
-  });
+      }
+    })
+  })
 }
