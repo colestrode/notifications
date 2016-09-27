@@ -6,7 +6,7 @@
   "scripts": {
     "echo": "echo 'deploy successful' && exit 0",
     "notify": "node index.js",
-    "pretest": "eslint index.js src/ test/ --fix",
+    "pretest": "standard index.js src/*.js src/**/*.js test/*.js test/**/*.js test/*.js --fix",
     "test": "istanbul cover --report lcov --dir ./coverage/ _mocha --recursive ./test --grep ./test/**/*.spec.js -- --colors --reporter spec",
     "ci": "npm test && cat ./coverage/lcov.info | coveralls"
   },
@@ -25,7 +25,6 @@
   },
   "homepage": "https://github.com/colestrode/notifications#readme",
   "dependencies": {
-    "eslint-config-sparkpost": "^1.1.0",
     "google-spreadsheet": "^1.1.4",
     "googleapis": "^2.1.7",
     "lodash": "^4.3.0",
@@ -45,6 +44,18 @@
     "proxyquire": "^1.7.10",
     "sinon": "^1.17.5",
     "sinon-as-promised": "^4.0.2",
-    "sinon-chai": "^2.8.0"
+    "sinon-chai": "^2.8.0",
+    "standard": "^8.2.0"
+  },
+  "standard": {
+    "globals": [
+      "after",
+      "afterEach",
+      "before",
+      "beforeEach",
+      "describe",
+      "expect",
+      "it"
+    ]
   }
 }

@@ -1,13 +1,13 @@
-'use strict';
+'use strict'
 
-const q = require('q');
-const _ = require('lodash');
+const q = require('q')
+const _ = require('lodash')
 const filters = require('require-all')({
   dirname: __dirname,
   recursive: true
-});
+})
 
-delete filters.index;
+delete filters.index
 
 /**
  * Filters can modify or remove any recipient in the array. They should handle empty arrays.
@@ -18,9 +18,9 @@ delete filters.index;
  * @param recipients
  * @returns {*}
  */
-module.exports = function(recipients) {
+module.exports = function (recipients) {
   // processes filters in series
   return _.reduce(filters, (promise, filter) => {
-    return promise.then(filter);
-  }, q(recipients));
-};
+    return promise.then(filter)
+  }, q(recipients))
+}

@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 module.exports = {
   google: {
@@ -11,4 +11,4 @@ module.exports = {
   sparkpost: {
     apiKey: process.env.SPARKPOST_API_KEY
   }
-};
+}
