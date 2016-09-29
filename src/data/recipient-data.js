@@ -31,27 +31,7 @@ module.exports.getRecpientData = function () {
         delete r.save
         delete r.del
 
-        r.fullname = makeFullname(row)
         return r
       })
     })
 }
-
-/**
- * Formats the patients first and last name into a full name
- * @param patient
- * @returns {string}
- */
-function makeFullname (patient) {
-  const name = []
-
-  if (patient.firstname) {
-    name.push(patient.firstname)
-  }
-
-  if (patient.lastname) {
-    name.push(patient.lastname)
-  }
-  return name.join(' ')
-}
-
