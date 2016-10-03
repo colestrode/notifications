@@ -17,7 +17,7 @@ module.exports.getEvents = function () {
     .then((eventsByCalendar) => {
       let allEvents = []
 
-      _.forEach(eventsByCalendar, function (events) {
+      _.forEach(eventsByCalendar, (events) => {
         allEvents = allEvents.concat(events)
       })
 
@@ -43,16 +43,14 @@ function getEvents (jwtClient, calendarId) {
     orderBy: 'startTime'
   }).then((response) => {
     const events = response[0].items
-    const creatorEvents = _.filter(events, function (event) {
+    const creatorEvents = _.filter(events, (event) => {
       // pull events for the creator if creator is defined, else pull all events
       return vars.google.calendarCreator ? event.creator.email === vars.google.calendarCreator : true
     })
 
-    return _.map(creatorEvents, function (event) {
-      const startDate = moment(event.start.dateTime)
-
+    return _.map(creatorEvents, (event) => {
       return {
-        eventStart: startDate,
+        eventStart: moment(event.start.dateTime),
         eventEnd: moment(event.end.dateTime),
         eventCreated: moment(event.created),
         eventUpdated: moment(event.updated),

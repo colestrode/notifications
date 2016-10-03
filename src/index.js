@@ -10,12 +10,7 @@ const transforms = require('./transforms')
 module.exports = function () {
   return data.getData()
     .then(transforms)
-    .then((recipients) => {
-      return q.all([
-        // text.send(recipients),
-        email.send(recipients)
-      ])
-    })
+    .then(email.send.bind(email))
     .then(() => {
       logger.warn('done sending notifications!')
       process.exit(0)

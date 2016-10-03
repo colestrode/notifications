@@ -62,7 +62,7 @@ function send (templateId, recipients) {
 function makeRecipient (recipient) {
   return {
     address: {
-      name: recipient.fullname,
+      name: recipient.firstname ? `${recipient.firstname} ${recipient.lastname || ''}` : recipient.email,
       email: recipient.email
     },
     'substitution_data': _.cloneDeep(recipient)

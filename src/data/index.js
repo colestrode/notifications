@@ -15,7 +15,7 @@ module.exports.getData = function () {
 }
 
 /**
- * Merges appointment with patient info
+ * Merges appointment with recipient info
  * @param events
  * @param recipientData
  * @returns {Array}
@@ -24,13 +24,12 @@ function mergeSheetData (events, recipientData) {
   const mergedData = []
 
   _.forEach(events, function (appointment) {
-    const patient = _.find(recipientData, function (recipient) {
-      return new RegExp('^' + recipient.id + '$|\\s' + recipient.id + '$', 'i').test(appointment.eventSummary)
+    const recipient = _.find(recipientData, (row) => {
+      return new RegExp('^' + row.id + '$|\\s' + row.id + '$', 'i').test(appointment.eventSummary)
     })
 
-    if (patient) {
-      _.merge(appointment, patient)
-      mergedData.push(appointment)
+    if (recipient) {
+      mergedData.push(_.merge(appointment, recipient))
     }
   })
 
