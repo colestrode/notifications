@@ -4,7 +4,6 @@ const email = require('./notifications/email')
 // const text = require('./notifications/text');
 const data = require('./data')
 const logger = require('./lib/logger')
-const q = require('q')
 const transforms = require('./transforms')
 
 module.exports = function () {

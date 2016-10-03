@@ -60,9 +60,16 @@ function send (templateId, recipients) {
  * Formats a recipient into a SparkPost recipient
  */
 function makeRecipient (recipient) {
+  let fullname = recipient.firstname
+  if (!fullname) {
+    fullname = recipient.email
+  } else if (recipient.lastname) {
+    fullname += ` ${recipient.lastname}`
+  }
+
   return {
     address: {
-      name: recipient.firstname ? `${recipient.firstname} ${recipient.lastname || ''}` : recipient.email,
+      name: fullname,
       email: recipient.email
     },
     'substitution_data': _.cloneDeep(recipient)

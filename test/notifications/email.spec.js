@@ -8,7 +8,7 @@ const _ = require('lodash')
 
 chai.use(require('sinon-chai'))
 
-describe('Wrappers: SparkPost', function () {
+describe('Notifications: Email', function () {
   let loggerMock
   let varsMock
   let sparkPostMock
@@ -49,13 +49,15 @@ describe('Wrappers: SparkPost', function () {
     const recipients = [{
       isNew: false,
       twoDays: true,
-      fullname: 'Walter White',
+      firstname: 'Walter',
+      lastname: 'White',
       email: 'walterwhite@jpwynnehs.gov',
       secretname: 'heisenberg'
     }, {
       isNew: true,
       twoDays: false,
-      fullname: 'Jesse Pinkman',
+      firstname: 'Jesse',
+      lastname: 'Pinkman',
       email: 'jpinkman69@verizon.net',
       secretname: 'capncook'
     }]
@@ -94,12 +96,54 @@ describe('Wrappers: SparkPost', function () {
       })
   })
 
+  it('should use email if firstname is missing', function () {
+    const recipients = [{
+      isNew: false,
+      twoDays: true,
+      email: 'walterwhite@jpwynnehs.gov',
+      secretname: 'heisenberg'
+    }]
+
+    return wrapper.send(recipients)
+      .then(function () {
+        let firstCallArg
+        let transmissionRecipients
+
+        firstCallArg = sparkpostClientMock.transmissions.send.args[0][0]
+        transmissionRecipients = _.get(firstCallArg, 'transmissionBody.recipients')
+        expect(transmissionRecipients).to.have.length(1)
+        expect(_.get(transmissionRecipients[0], 'address.name')).to.equal('walterwhite@jpwynnehs.gov')
+      })
+  })
+
+  it('should use only firstname if lastname is missing', function () {
+    const recipients = [{
+      isNew: false,
+      twoDays: true,
+      firstname: 'Walter',
+      email: 'walterwhite@jpwynnehs.gov',
+      secretname: 'heisenberg'
+    }]
+
+    return wrapper.send(recipients)
+      .then(function () {
+        let firstCallArg
+        let transmissionRecipients
+
+        firstCallArg = sparkpostClientMock.transmissions.send.args[0][0]
+        transmissionRecipients = _.get(firstCallArg, 'transmissionBody.recipients')
+        expect(transmissionRecipients).to.have.length(1)
+        expect(_.get(transmissionRecipients[0], 'address.name')).to.equal('Walter')
+      })
+  })
+
   it('should send new email over reminder email', function () {
     let firstCallArg
     const recipients = [{
       isNew: true,
       twoDays: true,
-      fullname: 'Walter White',
+      firstname: 'Walter',
+      lastname: 'White',
       email: 'walterwhite@jpwynnehs.gov',
       secretname: 'heisenberg'
     }]
@@ -117,7 +161,8 @@ describe('Wrappers: SparkPost', function () {
     const recipients = [{
       isNew: false,
       twoDays: false,
-      fullname: 'Walter White',
+      firstname: 'Walter',
+      lastname: 'White',
       email: 'walterwhite@jpwynnehs.gov',
       secretname: 'heisenberg'
     }]
@@ -135,7 +180,8 @@ describe('Wrappers: SparkPost', function () {
     return wrapper.send([{
       isNew: true,
       twoDays: false,
-      fullname: 'Walter White',
+      firstname: 'Walter',
+      lastname: 'White',
       email: 'walterwhite@jpwynnehs.gov',
       secretname: 'heisenberg'
     }])
