@@ -31,7 +31,7 @@
     "moment": "^2.11.2",
     "q": "^1.4.1",
     "require-all": "^2.0.0",
-    "sparkpost": "^1.1.0",
+    "sparkpost": "^2.0.0",
     "twilio": "^2.9.0",
     "winston": "^2.2.0"
   },
